@@ -44,11 +44,30 @@
 
   ::selection { background: var(--gold); color: var(--ink); }
 
+  /* ===== XP PROGRESS BAR ===== */
+  .xp-bar{
+    position: fixed; top:0; left:0; width:100%; height:8px;
+    background: #1a1a1a; z-index: 60;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+  }
+  .xp-fill{
+    height:100%; width:0%;
+    background: repeating-linear-gradient(90deg, #7cfc3f 0 8px, #63d92e 8px 16px);
+    box-shadow: 0 0 10px rgba(124,252,63,0.7);
+    transition: width .08s linear;
+  }
+
   /* ===== HOTBAR NAV ===== */
   nav.hotbar{
     position: sticky; top: 12px; z-index: 50;
     display:flex; justify-content:center;
     margin: 12px auto 0;
+    transition: transform .35s cubic-bezier(.25,.9,.3,1), opacity .3s ease;
+  }
+  nav.hotbar.hotbar-hidden{
+    transform: translateY(-120px);
+    opacity: 0;
+    pointer-events: none;
   }
   .hotbar-inner{
     display:flex; gap:6px;
@@ -71,6 +90,13 @@
     position:relative;
   }
   .hotbar-inner a:hover{ background:#a8ceff; transform: translateY(-3px); }
+  .hotbar-inner a:active{ transform: translateY(1px) scale(.92); }
+  .hotbar-inner a.active{
+    background: var(--gold);
+    box-shadow: inset 2px 2px 0 #fff6d0, inset -2px -2px 0 #b98b2c, 0 0 0 2px #fff, 0 0 12px rgba(244,198,73,0.7);
+    animation: slotSelect .35s ease;
+  }
+  @keyframes slotSelect{ 0%{ transform: scale(.8) translateY(0); } 60%{ transform: scale(1.15) translateY(-4px); } 100%{ transform: scale(1) translateY(0); } }
   .hotbar-inner a span.label{
     position:absolute; bottom:-22px; left:50%; transform:translateX(-50%);
     font-family:'VT323', monospace; font-size:14px; color:#1c1c1c;
@@ -80,6 +106,28 @@
   .hotbar-inner a:hover span.label{ opacity:1; }
 
   section{ padding: 90px 20px 40px; max-width: 1100px; margin:0 auto; }
+
+  /* ===== SCROLL REVEAL SYSTEM ===== */
+  .reveal{
+    opacity:0; transform: translateY(42px);
+    transition: opacity .65s cubic-bezier(.2,.8,.2,1), transform .65s cubic-bezier(.2,.8,.2,1);
+  }
+  .reveal.in-view{ opacity:1; transform: translateY(0); }
+
+  .reveal-stagger > *{
+    opacity:0; transform: translateY(34px) scale(.94);
+    transition: opacity .5s cubic-bezier(.2,.8,.2,1), transform .5s cubic-bezier(.2,.8,.2,1);
+  }
+  .reveal-stagger.in-view > *{ opacity:1; transform: translateY(0) scale(1); }
+  .reveal-stagger > *:nth-child(1){ transition-delay: .03s; }
+  .reveal-stagger > *:nth-child(2){ transition-delay: .08s; }
+  .reveal-stagger > *:nth-child(3){ transition-delay: .13s; }
+  .reveal-stagger > *:nth-child(4){ transition-delay: .18s; }
+  .reveal-stagger > *:nth-child(5){ transition-delay: .23s; }
+  .reveal-stagger > *:nth-child(6){ transition-delay: .28s; }
+  .reveal-stagger > *:nth-child(7){ transition-delay: .33s; }
+  .reveal-stagger > *:nth-child(8){ transition-delay: .38s; }
+  .reveal-stagger > *:nth-child(9){ transition-delay: .43s; }
 
   /* ===== HERO ===== */
   .hero{
@@ -100,7 +148,9 @@
     background-position: 5% 10px, 40% 50px, 75% 0px;
     opacity:.85;
     filter: drop-shadow(0 0 0 #fff);
+    animation: cloudDrift 22s ease-in-out infinite;
   }
+  @keyframes cloudDrift{ 0%,100%{ transform: translateX(0); } 50%{ transform: translateX(38px); } }
   .hero .blocks{
     position:absolute; bottom:0; left:0; width:100%; height:46%;
     background:
@@ -108,6 +158,17 @@
       repeating-linear-gradient(0deg, transparent 0 62px, rgba(0,0,0,0.06) 62px 66px);
   }
   .hero-content{ position:relative; z-index:2; }
+  .hero-content > *{
+    opacity:0; transform: translateY(24px);
+    animation: heroFadeUp .7s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  .hero-content > .eyebrow{ animation-delay: .1s; }
+  .hero-content > .spoon-icon-hero{ animation-delay: .25s; }
+  .hero-content > h1.title{ animation-delay: .4s; }
+  .hero-content > p.sub{ animation-delay: .6s; }
+  .hero-content > .note-badge{ animation-delay: .95s; }
+  @keyframes heroFadeUp{ to{ opacity:1; transform: translateY(0); } }
+
   .eyebrow{
     font-family:'VT323', monospace; font-size:22px; letter-spacing:3px;
     color:#fff; text-shadow: 2px 2px 0 #3e6b29;
@@ -127,8 +188,8 @@
     display:flex; align-items:center; justify-content:center;
     font-size:56px;
     box-shadow: 6px 6px 0 rgba(0,0,0,0.3);
-    animation: float 3s ease-in-out infinite;
   }
+  .spoon-icon-hero span{ display:inline-block; animation: float 3s ease-in-out 1s infinite; }
   @keyframes float{ 0%,100%{ transform: translateY(0) rotate(-4deg);} 50%{ transform: translateY(-14px) rotate(4deg);} }
 
   .hero p.sub{
@@ -147,9 +208,15 @@
     padding: 16px 22px;
     text-decoration:none;
     cursor:pointer;
-    transition: transform .08s;
+    transition: transform .1s ease;
   }
-  .cta:hover{ transform: translateY(-2px); }
+  .cta:hover{ transform: translateY(-2px); animation-play-state: paused; }
+  .cta:active{ transform: translateY(1px) scale(.97); }
+  .hero-content > .cta{ animation: heroFadeUp .7s cubic-bezier(.2,.8,.2,1) .78s forwards, ctaBreathe 2.6s ease-in-out 1.8s infinite; }
+  @keyframes ctaBreathe{
+    0%,100%{ box-shadow: inset 2px 2px 0 #a5764a, inset -2px -2px 0 #4a2c15, 5px 5px 0 rgba(0,0,0,0.3); }
+    50%{ box-shadow: inset 2px 2px 0 #a5764a, inset -2px -2px 0 #4a2c15, 5px 5px 0 rgba(0,0,0,0.3), 0 0 16px rgba(244,198,73,0.65); }
+  }
 
   .note-badge{
     margin-top:26px;
@@ -227,8 +294,9 @@
     font-size: 30px;
     position:relative;
     cursor: default;
+    transition: transform .15s ease, background .15s ease;
   }
-  .cslot[data-fill="1"]{ background:#a9missing; }
+  .cslot:hover{ background:#b3814f; transform: scale(1.08); z-index:2; }
   .cslot .tip{
     position:absolute; bottom: 84px; left:50%; transform: translateX(-50%);
     background: #000000e6; color:#fff; font-family:'VT323', monospace; font-size:16px;
@@ -236,7 +304,10 @@
     opacity:0; pointer-events:none; transition: opacity .15s;
   }
   .cslot:hover .tip{ opacity:1; }
-  .arrow{ font-size: 40px; }
+  .arrow{ font-size: 40px; display:flex; align-items:center; justify-content:center; }
+  .arrow-glyph{ display:inline-block; }
+  .craft-wrap.in-view .arrow-glyph{ animation: arrowSlide 1.3s ease-in-out .5s infinite; }
+  @keyframes arrowSlide{ 0%,100%{ transform: translateX(0); opacity:.85; } 50%{ transform: translateX(10px); opacity:1; } }
   .output-slot{
     width: 90px; height:90px;
     background: #dededea6;
@@ -244,6 +315,13 @@
     display:flex; align-items:center; justify-content:center;
     font-size: 44px;
     box-shadow: inset 0 0 0 4px rgba(255,255,255,0.3), 6px 6px 0 rgba(0,0,0,0.3);
+  }
+  .craft-wrap.in-view .output-slot{
+    animation: outputGlow 1.8s ease-in-out .9s infinite;
+  }
+  @keyframes outputGlow{
+    0%,100%{ box-shadow: inset 0 0 0 4px rgba(255,255,255,0.3), 6px 6px 0 rgba(0,0,0,0.3); transform: scale(1); }
+    50%{ box-shadow: inset 0 0 0 4px rgba(255,255,255,0.3), 6px 6px 0 rgba(0,0,0,0.3), 0 0 22px rgba(124,252,63,0.65); transform: scale(1.06); }
   }
   .craft-caption{
     font-family:'VT323', monospace; font-size: 20px; margin-top:22px; text-align:center; max-width:500px;
@@ -260,16 +338,30 @@
     border: 4px solid var(--ink);
     box-shadow: 6px 6px 0 rgba(0,0,0,0.25);
     padding: 18px;
-    transition: transform .12s;
+    transition: transform .16s ease, box-shadow .16s ease;
   }
-  .vcard:hover{ transform: translate(-3px,-3px); box-shadow: 9px 9px 0 rgba(0,0,0,0.3); }
+  .vcard:hover{ transform: translate(-3px,-5px) rotate(-.6deg); box-shadow: 9px 11px 0 rgba(0,0,0,0.3); }
   .vslot{
     width:100%; aspect-ratio:1;
     display:flex; align-items:center; justify-content:center;
     font-size:52px;
     margin-bottom:14px;
     border: 3px solid rgba(0,0,0,0.4);
+    position:relative;
+    overflow:hidden;
+    transition: transform .2s ease;
   }
+  .vcard:hover .vslot{ transform: scale(1.04); }
+  .vslot::after{
+    content:"";
+    position:absolute; top:-60%; left:-70%; width:45%; height:220%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.7), transparent);
+    transform: rotate(22deg);
+    transition: left .65s cubic-bezier(.2,.8,.2,1);
+  }
+  .vcard:hover .vslot::after{ left:150%; }
+  .vslot span{ display:inline-block; transition: transform .2s ease; }
+  .vcard:hover .vslot span{ transform: scale(1.15) rotate(-6deg); }
   .v-wood{ background: linear-gradient(135deg,#c99a63,#8a5f34); }
   .v-stone{ background: linear-gradient(135deg,#b7b7b7,#7a7a7a); }
   .v-iron{ background: linear-gradient(135deg,#eee6da,#b8ab99); }
@@ -291,8 +383,15 @@
     border: 3px solid #4a4a4a;
     box-shadow: inset 0 0 0 3px #fff;
     padding: 18px;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
   }
-  .use-card .icon{ font-size:30px; margin-bottom:10px; display:block; }
+  .use-card:hover{
+    transform: translateY(-5px);
+    background: #eaf3ff;
+    box-shadow: inset 0 0 0 3px #fff, 5px 5px 0 rgba(0,0,0,0.25);
+  }
+  .use-card .icon{ font-size:30px; margin-bottom:10px; display:block; transition: transform .2s ease; }
+  .use-card:hover .icon{ transform: scale(1.25) rotate(-8deg); }
   .use-card h3{ font-size:14px; margin: 0 0 8px; }
   .use-card p{ font-family:'VT323', monospace; font-size:17px; margin:0; line-height:1.4; }
 
@@ -304,11 +403,24 @@
   .timeline::before{
     content:""; position:absolute; left:10px; top:0; bottom:0; width:6px;
     background: repeating-linear-gradient(#f4c649 0 10px, #8a5f34 10px 20px);
+    transform-origin: top;
+    transform: scaleY(0);
+    transition: transform 1.1s cubic-bezier(.2,.8,.2,1);
   }
+  .timeline.in-view::before{ transform: scaleY(1); }
   .tl-item{ position:relative; margin-bottom: 34px; }
   .tl-item::before{
     content:""; position:absolute; left:-34px; top:2px; width:20px; height:20px;
     background: var(--gold); border:3px solid #4a2c15;
+    animation: dotPulse 2.2s ease-in-out infinite;
+  }
+  .tl-item:nth-child(1)::before{ animation-delay: 0s; }
+  .tl-item:nth-child(2)::before{ animation-delay: .3s; }
+  .tl-item:nth-child(3)::before{ animation-delay: .6s; }
+  .tl-item:nth-child(4)::before{ animation-delay: .9s; }
+  @keyframes dotPulse{
+    0%,100%{ box-shadow: 0 0 0 rgba(244,198,73,0); }
+    50%{ box-shadow: 0 0 12px rgba(244,198,73,0.85); }
   }
   .tl-item h3{ font-size:14px; margin:0 0 8px; color:#fff2c9; }
   .tl-item p{ font-family:'VT323', monospace; font-size:18px; margin:0; line-height:1.5; max-width:620px; }
@@ -321,6 +433,11 @@
     border: 4px solid var(--grass-dark);
     padding: 18px 20px;
     box-shadow: 5px 5px 0 rgba(0,0,0,0.25);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .trivia-card:hover{
+    transform: rotate(-1deg) translateY(-4px);
+    box-shadow: 7px 8px 0 rgba(0,0,0,0.3);
   }
   .trivia-card .num{ font-family:'Press Start 2P'; font-size:12px; color: var(--grass-dark); margin-bottom:8px; display:block; }
   .trivia-card p{ font-family:'VT323', monospace; font-size:18px; margin:0; line-height:1.45; }
@@ -334,12 +451,17 @@
   footer p{ font-family:'VT323', monospace; font-size:16px; margin: 6px 0; color:#bbb; }
 
   @media (prefers-reduced-motion: reduce){
-    .spoon-icon-hero{ animation:none; }
+    *, *::before, *::after{ animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
     html{ scroll-behavior:auto; }
+    .reveal, .reveal-stagger > *{ opacity:1; transform:none; }
+    .hero-content > *{ opacity:1; transform:none; }
+    .clouds{ animation:none; }
   }
 </style>
 </head>
 <body>
+
+<div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
 
 <nav class="hotbar">
   <div class="hotbar-inner">
@@ -357,7 +479,7 @@
   <div class="blocks"></div>
   <div class="hero-content">
     <div class="eyebrow">A FAN-MADE CONCEPT GUIDE</div>
-    <div class="spoon-icon-hero">🥄</div>
+    <div class="spoon-icon-hero"><span>🥄</span></div>
     <h1 class="title">MINECRAFT<br>SPOONS</h1>
     <p class="sub">The utensil the Overworld never knew it needed. Six tiers. One purpose. Zero forks.</p>
     <a href="#about" class="cta">▶ START DIGGING</a>
@@ -366,8 +488,8 @@
 </header>
 
 <section id="about">
-  <div class="section-head"><span class="tag">01</span><h2>What Is a Spoon?</h2><hr></div>
-  <div class="about-grid">
+  <div class="section-head reveal"><span class="tag">01</span><h2>What Is a Spoon?</h2><hr></div>
+  <div class="about-grid reveal">
     <div>
       <p>In this concept, a <strong>Spoon</strong> is a utility tool built for one job: getting food out of bowls faster and more efficiently than your bare hand. Where a hoe tills and an axe chops, a spoon <em>scoops</em> — turning mushroom stew, rabbit stew, beetroot soup, and suspicious stew into quick, no-waste meals.</p>
       <p>Like every good Minecraft tool, it comes in six material tiers, each one trading cost for speed, durability, and a few surprising bonus effects. A wooden spoon breaks fast. A netherite one practically feeds itself.</p>
@@ -383,9 +505,9 @@
 </section>
 
 <section id="crafting">
-  <div class="section-head"><span class="tag">02</span><h2>Crafting Recipe</h2><hr></div>
-  <div class="craft-wrap">
-    <div class="craft-table">
+  <div class="section-head reveal"><span class="tag">02</span><h2>Crafting Recipe</h2><hr></div>
+  <div class="craft-wrap reveal-stagger">
+    <div class="craft-table reveal-stagger">
       <div class="cslot"></div>
       <div class="cslot">🪵<span class="tip">Material ingot / plank</span></div>
       <div class="cslot"></div>
@@ -396,18 +518,18 @@
       <div class="cslot">🥢<span class="tip">Stick</span></div>
       <div class="cslot"></div>
     </div>
-    <div class="arrow">➜</div>
+    <div class="arrow"><span class="arrow-glyph">➜</span></div>
     <div class="output-slot">🥄</div>
   </div>
   <p class="craft-caption">Two of any tier material stacked in a column, plus one stick beneath — the same shape as a pickaxe head, minus the crossbar. Swap wood for stone, iron, gold, diamond, or netherite to craft each tier.</p>
 </section>
 
 <section id="variants">
-  <div class="section-head"><span class="tag">03</span><h2>The Six Tiers</h2><hr></div>
-  <div class="variant-grid">
+  <div class="section-head reveal"><span class="tag">03</span><h2>The Six Tiers</h2><hr></div>
+  <div class="variant-grid reveal-stagger">
 
     <div class="vcard">
-      <div class="vslot v-wood">🥄</div>
+      <div class="vslot v-wood"><span>🥄</span></div>
       <h3>Wooden Spoon</h3>
       <table>
         <tr><td>Scoop speed</td><td>1.0×</td></tr>
@@ -419,7 +541,7 @@
     </div>
 
     <div class="vcard">
-      <div class="vslot v-stone">🥄</div>
+      <div class="vslot v-stone"><span>🥄</span></div>
       <h3>Stone Spoon</h3>
       <table>
         <tr><td>Scoop speed</td><td>1.3×</td></tr>
@@ -431,7 +553,7 @@
     </div>
 
     <div class="vcard">
-      <div class="vslot v-iron">🥄</div>
+      <div class="vslot v-iron"><span>🥄</span></div>
       <h3>Iron Spoon</h3>
       <table>
         <tr><td>Scoop speed</td><td>1.6×</td></tr>
@@ -443,7 +565,7 @@
     </div>
 
     <div class="vcard">
-      <div class="vslot v-gold">🥄</div>
+      <div class="vslot v-gold"><span>🥄</span></div>
       <h3>Golden Spoon</h3>
       <table>
         <tr><td>Scoop speed</td><td>3.0×</td></tr>
@@ -455,7 +577,7 @@
     </div>
 
     <div class="vcard">
-      <div class="vslot v-diamond">🥄</div>
+      <div class="vslot v-diamond"><span>🥄</span></div>
       <h3>Diamond Spoon</h3>
       <table>
         <tr><td>Scoop speed</td><td>2.2×</td></tr>
@@ -467,7 +589,7 @@
     </div>
 
     <div class="vcard">
-      <div class="vslot v-netherite">🥄</div>
+      <div class="vslot v-netherite"><span>🥄</span></div>
       <h3>Netherite Spoon</h3>
       <table>
         <tr><td>Scoop speed</td><td>2.4×</td></tr>
@@ -482,8 +604,8 @@
 </section>
 
 <section id="uses">
-  <div class="section-head"><span class="tag">04</span><h2>What You'd Actually Do With One</h2><hr></div>
-  <div class="uses-grid">
+  <div class="section-head reveal"><span class="tag">04</span><h2>What You'd Actually Do With One</h2><hr></div>
+  <div class="uses-grid reveal-stagger">
     <div class="use-card">
       <span class="icon">🍲</span>
       <h3>Faster Soup Eating</h3>
@@ -518,8 +640,8 @@
 </section>
 
 <section id="lore">
-  <div class="section-head"><span class="tag">05</span><h2>A Little (Made-Up) History</h2><hr></div>
-  <div class="timeline">
+  <div class="section-head reveal"><span class="tag">05</span><h2>A Little (Made-Up) History</h2><hr></div>
+  <div class="timeline reveal reveal-stagger">
     <div class="tl-item">
       <h3>THE IDEA</h3>
       <p>Long before pickaxes and swords dominated the toolbelt, someone in the community sketched the idea of a soup-scooping counterpart to the sword — same crafting shape, opposite purpose.</p>
@@ -540,8 +662,8 @@
 </section>
 
 <section id="trivia">
-  <div class="section-head"><span class="tag">06</span><h2>Trivia & Fan Notes</h2><hr></div>
-  <div class="trivia-grid">
+  <div class="section-head reveal"><span class="tag">06</span><h2>Trivia & Fan Notes</h2><hr></div>
+  <div class="trivia-grid reveal-stagger">
     <div class="trivia-card">
       <span class="num">✦ 01</span>
       <p>The crafting shape mirrors a pickaxe rotated upside down — a nod to "digging into your dinner."</p>
@@ -575,5 +697,71 @@
   <p>Minecraft is a trademark of Mojang Studios. This page uses no official assets, textures, or logos.</p>
 </footer>
 
+<script>
+(function(){
+  var nav = document.querySelector('nav.hotbar');
+  var xpFill = document.getElementById('xpFill');
+  var lastY = window.scrollY;
+  var ticking = false;
+
+  function onScroll(){
+    var y = window.scrollY;
+
+    // XP bar fill = scroll progress
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var pct = docHeight > 0 ? Math.min(100, (y / docHeight) * 100) : 0;
+    xpFill.style.width = pct + '%';
+
+    // Hide hotbar when scrolling down, show when scrolling up
+    if (y > lastY && y > 140) {
+      nav.classList.add('hotbar-hidden');
+    } else {
+      nav.classList.remove('hotbar-hidden');
+    }
+    lastY = y;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', function(){
+    if (!ticking) {
+      window.requestAnimationFrame(onScroll);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  // Scroll-triggered reveal animations
+  var revealEls = document.querySelectorAll('.reveal, .reveal-stagger');
+  if ('IntersectionObserver' in window) {
+    var revealIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          revealIO.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    revealEls.forEach(function(el){ revealIO.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('in-view'); });
+  }
+
+  // Highlight the hotbar slot matching the section in view
+  var sections = document.querySelectorAll('section[id]');
+  var links = document.querySelectorAll('.hotbar-inner a');
+  if ('IntersectionObserver' in window) {
+    var navIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var link = document.querySelector('.hotbar-inner a[href="#' + entry.target.id + '"]');
+        if (!link) return;
+        if (entry.isIntersecting) {
+          links.forEach(function(l){ l.classList.remove('active'); });
+          link.classList.add('active');
+        }
+      });
+    }, { threshold: 0.4 });
+    sections.forEach(function(sec){ navIO.observe(sec); });
+  }
+})();
+</script>
 </body>
 </html>
