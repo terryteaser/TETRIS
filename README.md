@@ -1,4 +1,4 @@
 # TETRIS
-just tetris lol
+ART
 
 [olivercarelle.com](http://olivercarelle.com/)
